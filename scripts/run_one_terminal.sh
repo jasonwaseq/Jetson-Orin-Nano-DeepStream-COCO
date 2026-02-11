@@ -9,6 +9,7 @@ FPS_N="${FPS_N:-80}"
 FPS_D="${FPS_D:-1}"
 RTSP_PORT="${RTSP_PORT:-8554}"
 UDP_PORT="${UDP_PORT:-5400}"
+DS_YOLO_LOG="${DS_YOLO_LOG:-1}"
 
 if [[ ! -e "${CAM_DEV}" ]]; then
   echo "Camera device not found: ${CAM_DEV}"
@@ -38,7 +39,9 @@ perl -0777 -i -pe "s/rtsp-port=\\d+/rtsp-port=${RTSP_PORT}/g; s/udp-port=\\d+/ud
 echo "[3/4] Launching DeepStream..."
 echo "RTSP: rtsp://<JETSON_IP>:${RTSP_PORT}/ds-test"
 echo "Camera: ${CAM_DEV} (${WIDTH}x${HEIGHT} @ ${FPS_N}/${FPS_D})"
+echo "YOLO log: ${DS_YOLO_LOG}"
 
 cd /home/group7/jetson-deepstream-coco
 echo "[4/4] Running: deepstream-app -c configs/deepstream_app_usb_yolo.txt"
+export DS_YOLO_LOG
 exec deepstream-app -c configs/deepstream_app_usb_yolo.txt

@@ -25,6 +25,8 @@
 
 #include "nvdsinfer_custom_impl.h"
 
+#include <cstdlib>
+
 #include "utils.h"
 
 extern "C" bool
@@ -119,6 +121,24 @@ NvDsInferParseCustomYolo(std::vector<NvDsInferLayerInfo> const& outputLayersInfo
   objects.insert(objects.end(), outObjs.begin(), outObjs.end());
 
   objectList = objects;
+
+  static int logEnabled = []() {
+    const char* env = std::getenv("DS_YOLO_LOG");
+    return (env && env[0] != '0') ? 1 : 0;
+  }();
+
+  if (logEnabled) {
+    std::cout << "[DS-YOLO] objects=" << objectList.size();
+    size_t limit = objectList.size() < 5 ? objectList.size() : 5;
+    for (size_t i = 0; i < limit; ++i) {
+      const auto& o = objectList[i];
+      std::cout << " | cls=" << o.classId
+                << " conf=" << o.detectionConfidence
+                << " box=" << o.left << "," << o.top
+                << "," << o.width << "," << o.height;
+    }
+    std::cout << std::endl;
+  }
 
   return true;
 }
