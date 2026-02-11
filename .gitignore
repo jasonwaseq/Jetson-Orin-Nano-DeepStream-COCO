@@ -1,0 +1,30 @@
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# Virtualenv
+.venv/
+
+# Logs
+*.log
+run.log
+
+# DeepStream / TensorRT artifacts
+*.engine
+*.plan
+*.cache
+
+# Model artifacts (large files)
+*.onnx
+*.pt
+*.pth
+
+# Build outputs
+build/
+dist/
+
+# OS / editor
+.DS_Store
+.vscode/
