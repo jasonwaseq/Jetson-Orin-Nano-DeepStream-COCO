@@ -17,6 +17,7 @@ CAM_DEV=/dev/video0 WIDTH=1280 HEIGHT=720 FPS_N=80 FPS_D=1 \
 ```
 
 If you see “Device /dev/video0 is busy”, stop any existing DeepStream process and retry.
+sudo pkill -f deepstream-app
 
 ## View the stream
 **Remote (Windows/macOS/Linux with GUI):**
