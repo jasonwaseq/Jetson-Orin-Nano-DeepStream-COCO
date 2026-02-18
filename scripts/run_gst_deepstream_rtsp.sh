@@ -74,8 +74,37 @@ PIPE_PID=$!
 # Kill the pipeline on any exit (normal, Ctrl+C, or error)
 trap 'echo "Stopping pipeline (PID ${PIPE_PID})..."; kill "${PIPE_PID}" 2>/dev/null || true' EXIT INT TERM
 
-# ── Start in-process RTSP server ─────────────────────────────────────────────
+# ── Start RTSP server ─────────────────────────────────────────────────────────
+# Prefer the standalone binary if available; fall back to Python GstRtspServer
+# (GstRtspServer Python bindings ship with DeepStream / Jetson GStreamer stack)
 
-gst-rtsp-server \
-  --port="${PORT}" \
-  "( udpsrc name=pay0 port=${UDP_PORT} caps=\"application/x-rtp,media=video,encoding-name=H264,payload=96\" )"
+LAUNCH_CAPS="application/x-rtp,media=video,encoding-name=H264,payload=96"
+LAUNCH_PIPELINE="( udpsrc name=pay0 port=${UDP_PORT} caps=\"${LAUNCH_CAPS}\" )"
+
+if command -v gst-rtsp-server &>/dev/null; then
+  gst-rtsp-server --port="${PORT}" "${LAUNCH_PIPELINE}"
+else
+  echo "INFO: gst-rtsp-server binary not found — using Python GstRtspServer." >&2
+  python3 - <<PYEOF
+import gi
+gi.require_version('Gst', '1.0')
+gi.require_version('GstRtspServer', '1.0')
+from gi.repository import Gst, GstRtspServer, GLib
+
+Gst.init(None)
+loop   = GLib.MainLoop()
+server = GstRtspServer.RTSPServer.new()
+server.set_service("${PORT}")
+mounts = server.get_mount_points()
+factory = GstRtspServer.RTSPMediaFactory.new()
+factory.set_launch("${LAUNCH_PIPELINE}")
+factory.set_shared(True)
+mounts.add_factory("/ds-test", factory)
+server.attach(None)
+print("RTSP server listening on rtsp://0.0.0.0:${PORT}/ds-test")
+try:
+    loop.run()
+except KeyboardInterrupt:
+    pass
+PYEOF
+fi
