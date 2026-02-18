@@ -10,21 +10,11 @@ Run YOLOv8 COCO detection on a Jetson Orin Nano with a See3CAM_CU27 USB camera a
 
 ## Quick start (on Jetson)
 
-### Option A — DeepStream app (recommended)
 ```bash
 # Start DeepStream + RTSP (all parameters are optional; shown with defaults)
 CAM_DEV=/dev/video0 WIDTH=1280 HEIGHT=720 FPS_N=80 FPS_D=1 \
   RTSP_PORT=8554 UDP_PORT=5400 \
   /home/group7/jetson-deepstream-coco/scripts/run_one_terminal.sh
-```
-
-### Option B — Raw GStreamer pipeline
-```bash
-# Start a GStreamer pipeline + RTSP server
-# FPS must match what the camera actually delivers (default: 30)
-CAM_DEV=/dev/video0 WIDTH=1280 HEIGHT=720 FPS=30 \
-  RTSP_PORT=8554 UDP_PORT=5400 \
-  /home/group7/jetson-deepstream-coco/scripts/run_gst_deepstream_rtsp.sh
 ```
 
 If you see "Device /dev/video0 is busy", stop any existing DeepStream process and retry:
@@ -39,12 +29,11 @@ sudo pkill -f deepstream-app
 | `CAM_DEV` | `/dev/video0` | Camera device path |
 | `WIDTH` | `1280` | Capture width (pixels) |
 | `HEIGHT` | `720` | Capture height (pixels) |
-| `FPS_N` | `80` | FPS numerator (DeepStream / Option A) |
-| `FPS_D` | `1` | FPS denominator (DeepStream / Option A) |
-| `FPS` | `30` | GStreamer framerate (Option B only) |
+| `FPS_N` | `80` | FPS numerator |
+| `FPS_D` | `1` | FPS denominator |
 | `RTSP_PORT` | `8554` | RTSP server port |
 | `UDP_PORT` | `5400` | Internal UDP relay port |
-| `DS_YOLO_LOG` | `1` | Enable YOLO detection logging (Option A) |
+| `DS_YOLO_LOG` | `1` | Enable YOLO detection logging |
 
 ## View the stream
 **Remote (Windows/macOS/Linux with GUI):**
